@@ -22,14 +22,6 @@ co(function* () {
         yield idevicekit.crashreport(device, 'CrashDemo').then((crashLogs) => {
             console.log(JSON.stringify(crashLogs));
         });
-        idevicekit.syslog(device).then((emitter) => {
-            emitter.on('log', (data) => {
-                console.log(JSON.stringify(data));
-            });
-            setTimeout(() => {
-                emitter.emit('close');
-            }, 10000);
-        });
     }
 }).catch((err) => {
     console.log(err);

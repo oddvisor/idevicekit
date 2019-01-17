@@ -125,7 +125,7 @@ class iDeviceClient extends EventEmitter {
         return resultPromise.then(() => {
             return new Promise((resolve, reject) => {
                 exec(cmd, {timeout: 300000}).then((output) => {
-                    if (/\s - Complete\s/.test(output)) {
+                    if (/\sComplete\s/.test(output)) {
                         resolve(output);
                     } else {
                         reject(output);
@@ -135,36 +135,6 @@ class iDeviceClient extends EventEmitter {
                 });
             })
         });
-    }
-
-    syslog(serial, ipa) {
-        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let patternFile = require('path').join(__dirname, 'patterns.yml');
-        let spawn = require('child_process').spawn;
-        let emitter = new EventEmitter();
-        let process = spawn('idevicesyslog', ['-u', serial]);
-        let Logparser = require('logagent-js');
-        let lp = new Logparser(patternFile);
-        process.stdout.setEncoding('utf8');
-        process.stdout.on('data', (data) => {
-            let str = data.toString(),
-                lines = str.split(/(\r?\n)/g);
-            for (let line of lines) {
-                lp.parseLine(line, 'log', (err, data) => {
-                    if (err) {
-                    } else {
-                        emitter.emit('log', data);
-                    }
-                });
-            }
-        });
-        process.stdout.on('end', () => {
-            emitter.emit('close');
-        });
-        emitter.on('close', () => {
-            process.kill();
-        });
-        return Promise.resolve(emitter);
     }
 
     reboot(serial) {
@@ -221,7 +191,7 @@ class iDeviceClient extends EventEmitter {
                 let points = {
                     width: Math.floor(resolution.width / resolution.scale),
                     height: Math.floor(resolution.height / resolution.scale)
-                }; 
+                };
                 if ((resolution.width === 1080) && (resolution.height === 1920)) {
                     // There is some diffences between Physical Pixels and Rendered Pixels
                     // on device iPhone [6,6s,7] plus.
@@ -272,7 +242,7 @@ class iDeviceClient extends EventEmitter {
             tmpDir = tmpDir.trim();
             let cmd = `idevicecrashreport -u "${serial}" -e "${tmpDir}"`;
             return exec(cmd).then(() => {
-                let crashLogRegex = new RegExp(`^${appName}.*\.ips$`); 
+                let crashLogRegex = new RegExp(`^${appName}.*\.ips$`);
                 let result = {};
                 fs.readdirSync(tmpDir).forEach((currentFile) => {
                     let crashLogFileName = crashLogRegex.exec(currentFile);
@@ -280,8 +250,8 @@ class iDeviceClient extends EventEmitter {
                         result.currentFile = fs.readFileSync(path.join(tmpDir, currentFile), 'utf8');
                     }
                 });
-                
-                return result; 
+
+                return result;
             });
         });
     }

@@ -1,7 +1,7 @@
 {
-  "name": "idevicekit",
-  "version": "0.2.8",
-  "description": "NodeJs wrapper for libimobiledevice",
+  "name": "limdk",
+  "version": "0.0.1",
+  "description": "fork of idevicekit",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/thebeet/idevicekit#readme",
   "dependencies": {
-    "logagent-js": "^1.2.39",
     "plist": "^2.0.1",
     "sharp": "^0.16.2",
     "tempfile": "^1.1.1"

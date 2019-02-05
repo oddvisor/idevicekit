@@ -32,6 +32,13 @@ class iDeviceClient extends EventEmitter {
     }
 
     // ## raw api ##
+    getEnclosureColorCode(serial) {
+		if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+		let cmd = 'ideviceinfo -u ' + serial + ' -k DeviceEnclosureColor';
+		return exec(cmd).then((result) => {
+			return result.trim();
+		});
+    }
 
     getProperties(serial, option) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
@@ -243,10 +250,12 @@ class iDeviceClient extends EventEmitter {
     getStorage(serial) {
         return this.getProperties(serial, {domain: 'com.apple.disk_usage'})
             .then((result) => {
+				let disk = result['TotalDiskCapacity'];
                 let size = result['TotalDataCapacity'];
                 let free = result['TotalDataAvailable'];
                 let used = size - free;
                 return {
+					disk: disk,
                     size: size,
                     used: used,
                     free: free,

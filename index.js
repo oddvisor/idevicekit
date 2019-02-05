@@ -137,7 +137,7 @@ class iDeviceClient extends EventEmitter {
         });
     }
 
-    uninstall(serial, package, option) {
+    uninstall(serial, packageid, option) {
 	        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
 	        let defaultOption = {
 	            resign: false,
@@ -156,7 +156,7 @@ class iDeviceClient extends EventEmitter {
 	        } else {
 	            resultPromise = Promise.resolve();
 	        }
-	        let cmd = 'ideviceinstaller -u ' + serial + ' -U ' + package;
+	        let cmd = 'ideviceinstaller -u ' + serial + ' -U ' + packageid;
 	        return resultPromise.then(() => {
 	            return new Promise((resolve, reject) => {
 	                exec(cmd, {timeout: 300000}).then((output) => {

@@ -137,6 +137,41 @@ class iDeviceClient extends EventEmitter {
         });
     }
 
+    uninstall(serial, package, option) {
+	        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+	        let defaultOption = {
+	            resign: false,
+	            mobileprovision: './develop.mobileprovision',
+	            identity: 'iPhone Developer: xxxx (XXXXXXXXXX)',
+	            keychainPassword: ''
+	        };
+	        defaultOption = extend(true, defaultOption, option);
+	        let resultPromise;
+	        if (defaultOption.resign) {
+	            let path = require('path');
+	            let shell = path.join(__dirname, 'tools', 'r.sh');
+	            let cmd = 'sh ' + shell + ' "' + ipa + '" "' + defaultOption.mobileprovision + '" "' + defaultOption.identity +
+	                '" "' + ipa + '" "' + defaultOption.keychainPassword + '"';
+	            resultPromise = exec(cmd, {timeout: 300000});
+	        } else {
+	            resultPromise = Promise.resolve();
+	        }
+	        let cmd = 'ideviceinstaller -u ' + serial + ' -U ' + package;
+	        return resultPromise.then(() => {
+	            return new Promise((resolve, reject) => {
+	                exec(cmd, {timeout: 300000}).then((output) => {
+	                    if (/\sComplete\s/.test(output)) {
+	                        resolve(output);
+	                    } else {
+	                        reject(output);
+	                    }
+	                }, (code, stdout, stderr) => {
+	                    reject(code);
+	                });
+	            })
+	        });
+    }
+
     reboot(serial) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
         let cmd = 'idevicediagnostics restart -u ' + serial;

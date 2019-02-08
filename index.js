@@ -128,7 +128,7 @@ class iDeviceClient extends EventEmitter {
         } else {
             resultPromise = Promise.resolve();
         }
-        let cmd = 'ideviceinstaller -u ' + serial + ' -i ' + ipa;
+        let cmd = 'ideviceinstaller -u ' + serial + ' -i "' + ipa + '"';
         return resultPromise.then(() => {
             return new Promise((resolve, reject) => {
                 exec(cmd, {timeout: 300000}).then((output) => {

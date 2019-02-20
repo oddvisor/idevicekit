@@ -208,6 +208,12 @@ class iDeviceClient extends EventEmitter {
         });
     }
 
+    runCommand(cmd) {
+		return exec(cmd).then((result) => {
+		    return result.trim();
+        });
+	}
+
     activatePhone(serial) {
 		if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
 		let cmd = 'ideviceactivation -u ' + serial + ' activate';

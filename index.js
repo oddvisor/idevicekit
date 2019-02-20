@@ -209,8 +209,8 @@ class iDeviceClient extends EventEmitter {
     }
 
     runCommand(cmd) {
-		return exec(cmd).then((result) => {
-		    return result.trim();
+		return exec(cmd).then(() => {
+		    return true;
         });
 	}
 

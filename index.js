@@ -1,5 +1,3 @@
-
-
 let EventEmitter = require('events');
 let plist = require('plist');
 let extend = require('extend');
@@ -9,7 +7,8 @@ const path = require('path');
 let exec = require('./exec');
 
 let _checkSerial = (serial) => {
-    return /^[a-z0-9]{40,40}$/.test(serial);
+    //return /^[a-z0-9]{40,40}$/.test(serial);
+    return serial.length > 0;
 };
 
 class iDeviceClient extends EventEmitter {
@@ -217,6 +216,14 @@ class iDeviceClient extends EventEmitter {
     activatePhone(serial) {
 		if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
 		let cmd = 'ideviceactivation -u ' + serial + ' activate';
+		return exec(cmd).then((result) => {
+			return result.toLowerCase().indexOf('success') > -1;
+		});
+    }
+
+    ganymedeUploadTestInfo(serial, sourcefile) {
+		if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+		let cmd = 'idevice_ganymedeafc -u ' + serial + ' upload ' + sourcefile;
 		return exec(cmd).then((result) => {
 			return result.toLowerCase().indexOf('success') > -1;
 		});

@@ -210,6 +210,8 @@ class iDeviceClient extends EventEmitter {
     runCommand(cmd) {
 		return exec(cmd).then((result) => {
 		    return result;
+        }, (error) => {
+            return error;
         });
 	}
 
@@ -218,7 +220,9 @@ class iDeviceClient extends EventEmitter {
 		let cmd = 'ideviceactivation -u ' + serial + ' activate';
 		return exec(cmd).then((result) => {
 			return result.toLowerCase().indexOf('success') > -1;
-		});
+		}, (error) => {
+            return error;
+        });
     }
 
     ganymedeUploadTestInfo(serial, sourcefile) {
@@ -226,7 +230,9 @@ class iDeviceClient extends EventEmitter {
 		let cmd = 'idevice_ganymedeafc -u ' + serial + ' upload ' + sourcefile;
 		return exec(cmd).then((result) => {
 			return result.toLowerCase().indexOf('success') > -1;
-		});
+		}, (error) => {
+            return error;
+        });
     }
 
     // ## shortcut method ##

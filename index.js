@@ -240,7 +240,9 @@ class iDeviceClient extends EventEmitter {
 		let cmd = 'idevice_ganymedeprepare -u ' + serial;
 		return exec(cmd).then((result) => {
 			return result.toLowerCase().indexOf('success') > -1;
-		});
+		}, (error) => {
+            return error;
+        });
     }
 
     // ## shortcut method ##

@@ -229,6 +229,14 @@ class iDeviceClient extends EventEmitter {
 		});
     }
 
+    ganymedePrepareIphone(serial) {
+		if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+		let cmd = 'idevice_ganymedeprepare -u ' + serial;
+		return exec(cmd).then((result) => {
+			return result.toLowerCase().indexOf('success') > -1;
+		});
+    }
+
     // ## shortcut method ##
 
     getBasicInformation(serial) {

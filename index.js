@@ -90,7 +90,7 @@ class iDeviceClient extends EventEmitter {
         });
     }
 
-    screencap(serial, option) {
+    /*screencap(serial, option) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
         let defaultOption = {
             format: 'png'
@@ -108,7 +108,7 @@ class iDeviceClient extends EventEmitter {
                 resolve(outputStream);
             }, reject);
         });
-    }
+    }*/
 
     install(serial, ipa, option) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');

@@ -1,6 +1,6 @@
 {
   "name": "limdk",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "fork of idevicekit",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,6 @@
   "homepage": "https://github.com/thebeet/idevicekit#readme",
   "dependencies": {
     "plist": "^2.0.1",
-    "sharp": "^0.16.2",
     "tempfile": "^1.1.1"
   },
   "engines": {

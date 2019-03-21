@@ -48,6 +48,9 @@ class iDeviceClient extends EventEmitter {
             }
             if (('domain' in option) && (option['domain'])) {
                 cmd += ' -q ' + option['domain'];
+                if (('key' in option) && (option['key'])) {
+                    cmd += ' -k ' + option['key'];
+                }
             }
         }
         return exec(cmd).then((stdout) => {
@@ -235,9 +238,9 @@ class iDeviceClient extends EventEmitter {
         });
     }
 
-    ganymedePrepareIphone(serial) {
+    ganymedePrepareIphone(serial, zone) {
 		if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-		let cmd = 'idevice_ganymedeprepare -u ' + serial;
+		let cmd = 'idevice_ganymedeprepare -u ' + serial + ' -z ' + zone;
 		return exec(cmd).then((result) => {
 			return result.toLowerCase().indexOf('success') > -1;
 		}, (error) => {

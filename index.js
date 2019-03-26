@@ -214,7 +214,7 @@ class iDeviceClient extends EventEmitter {
         return exec(cmd).then((result) => {
             return result;
         }, (error) => {
-            reject(error);
+            throw error;
         });
     }
 
@@ -224,7 +224,7 @@ class iDeviceClient extends EventEmitter {
         return exec(cmd).then((result) => {
             return result.toLowerCase().indexOf('success') > -1;
         }, (error) => {
-            reject(error);
+            throw error;
         });
     }
 
@@ -234,7 +234,7 @@ class iDeviceClient extends EventEmitter {
         return exec(cmd).then((result) => {
             return result.toLowerCase().indexOf('success') > -1;
         }, (error) => {
-            reject(error);
+            throw error;
         });
     }
 
@@ -244,7 +244,23 @@ class iDeviceClient extends EventEmitter {
         return exec(cmd).then((result) => {
             return result.toLowerCase().indexOf('success') > -1;
         }, (error) => {
-            reject(error);
+            throw error;
+        });
+    }
+
+    getBatteryData(serial, ioregEntry) {
+        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+        let cmd = 'idevicediagnostics -u ' + serial + ' ioregentry ' + ioregEntry;
+
+        return exec(cmd).then((stdout) => {
+            try {
+                let result = plist.parse(stdout);
+                return result;
+            } catch (e) {
+                return {};
+            }
+        }, (error) => {
+            return {};
         });
     }
 
@@ -337,20 +353,6 @@ class iDeviceClient extends EventEmitter {
 
                 return result;
             });
-        });
-    }
-
-    getBatteryData(serial, ioregEntry) {
-        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = 'idevicediagnostics -u ' + serial + ' ioregentry ' + ioregEntry;
-
-        return exec(cmd).then((stdout) => {
-            try {
-                let result = plist.parse(stdout);
-                return result;
-            } catch (e) {
-                return {};
-            }
         });
     }
 }

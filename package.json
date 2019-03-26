@@ -1,6 +1,6 @@
 {
   "name": "limdk",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "fork of idevicekit",
   "main": "index.js",
   "scripts": {

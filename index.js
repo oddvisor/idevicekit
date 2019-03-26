@@ -32,11 +32,11 @@ class iDeviceClient extends EventEmitter {
 
     // ## raw api ##
     getEnclosureColorCode(serial) {
-		if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-		let cmd = 'ideviceinfo -u ' + serial + ' -k DeviceEnclosureColor';
-		return exec(cmd).then((result) => {
-			return result.trim();
-		});
+        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+        let cmd = 'ideviceinfo -u ' + serial + ' -k DeviceEnclosureColor';
+        return exec(cmd).then((result) => {
+            return result.trim();
+        });
     }
 
     getProperties(serial, option) {
@@ -126,14 +126,14 @@ class iDeviceClient extends EventEmitter {
             let shell = path.join(__dirname, 'tools', 'r.sh');
             let cmd = 'sh ' + shell + ' "' + ipa + '" "' + defaultOption.mobileprovision + '" "' + defaultOption.identity +
                 '" "' + ipa + '" "' + defaultOption.keychainPassword + '"';
-            resultPromise = exec(cmd, {timeout: 300000});
+            resultPromise = exec(cmd, { timeout: 300000 });
         } else {
             resultPromise = Promise.resolve();
         }
         let cmd = 'ideviceinstaller -u ' + serial + ' -i "' + ipa + '"';
         return resultPromise.then(() => {
             return new Promise((resolve, reject) => {
-                exec(cmd, {timeout: 300000}).then((output) => {
+                exec(cmd, { timeout: 300000 }).then((output) => {
                     if (/\sComplete\s/.test(output)) {
                         resolve(output);
                     } else {
@@ -147,38 +147,38 @@ class iDeviceClient extends EventEmitter {
     }
 
     uninstall(serial, packageid, option) {
-	        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-	        let defaultOption = {
-	            resign: false,
-	            mobileprovision: './develop.mobileprovision',
-	            identity: 'iPhone Developer: xxxx (XXXXXXXXXX)',
-	            keychainPassword: ''
-	        };
-	        defaultOption = extend(true, defaultOption, option);
-	        let resultPromise;
-	        if (defaultOption.resign) {
-	            let path = require('path');
-	            let shell = path.join(__dirname, 'tools', 'r.sh');
-	            let cmd = 'sh ' + shell + ' "' + ipa + '" "' + defaultOption.mobileprovision + '" "' + defaultOption.identity +
-	                '" "' + ipa + '" "' + defaultOption.keychainPassword + '"';
-	            resultPromise = exec(cmd, {timeout: 300000});
-	        } else {
-	            resultPromise = Promise.resolve();
-	        }
-	        let cmd = 'ideviceinstaller -u ' + serial + ' -U ' + packageid;
-	        return resultPromise.then(() => {
-	            return new Promise((resolve, reject) => {
-	                exec(cmd, {timeout: 300000}).then((output) => {
-	                    if (/\sComplete\s/.test(output)) {
-	                        resolve(output);
-	                    } else {
-	                        reject(output);
-	                    }
-	                }, (code, stdout, stderr) => {
-	                    reject(code);
-	                });
-	            })
-	        });
+        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+        let defaultOption = {
+            resign: false,
+            mobileprovision: './develop.mobileprovision',
+            identity: 'iPhone Developer: xxxx (XXXXXXXXXX)',
+            keychainPassword: ''
+        };
+        defaultOption = extend(true, defaultOption, option);
+        let resultPromise;
+        if (defaultOption.resign) {
+            let path = require('path');
+            let shell = path.join(__dirname, 'tools', 'r.sh');
+            let cmd = 'sh ' + shell + ' "' + ipa + '" "' + defaultOption.mobileprovision + '" "' + defaultOption.identity +
+                '" "' + ipa + '" "' + defaultOption.keychainPassword + '"';
+            resultPromise = exec(cmd, { timeout: 300000 });
+        } else {
+            resultPromise = Promise.resolve();
+        }
+        let cmd = 'ideviceinstaller -u ' + serial + ' -U ' + packageid;
+        return resultPromise.then(() => {
+            return new Promise((resolve, reject) => {
+                exec(cmd, { timeout: 300000 }).then((output) => {
+                    if (/\sComplete\s/.test(output)) {
+                        resolve(output);
+                    } else {
+                        reject(output);
+                    }
+                }, (code, stdout, stderr) => {
+                    reject(code);
+                });
+            })
+        });
     }
 
     reboot(serial) {
@@ -211,40 +211,40 @@ class iDeviceClient extends EventEmitter {
     }
 
     runCommand(cmd) {
-		return exec(cmd).then((result) => {
-		    return result;
+        return exec(cmd).then((result) => {
+            return result;
         }, (error) => {
-            return error;
+            reject(error);
         });
-	}
+    }
 
     activatePhone(serial) {
-		if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-		let cmd = 'ideviceactivation -u ' + serial + ' activate';
-		return exec(cmd).then((result) => {
-			return result.toLowerCase().indexOf('success') > -1;
-		}, (error) => {
-            return error;
+        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+        let cmd = 'ideviceactivation -u ' + serial + ' activate';
+        return exec(cmd).then((result) => {
+            return result.toLowerCase().indexOf('success') > -1;
+        }, (error) => {
+            reject(error);
         });
     }
 
     ganymedeUploadTestInfo(serial, sourcefile) {
-		if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-		let cmd = 'idevice_ganymedeafc -u ' + serial + ' upload ' + sourcefile;
-		return exec(cmd).then((result) => {
-			return result.toLowerCase().indexOf('success') > -1;
-		}, (error) => {
-            return error;
+        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+        let cmd = 'idevice_ganymedeafc -u ' + serial + ' upload ' + sourcefile;
+        return exec(cmd).then((result) => {
+            return result.toLowerCase().indexOf('success') > -1;
+        }, (error) => {
+            reject(error);
         });
     }
 
     ganymedePrepareIphone(serial, zone) {
-		if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-		let cmd = 'idevice_ganymedeprepare -u ' + serial + ' -z ' + zone;
-		return exec(cmd).then((result) => {
-			return result.toLowerCase().indexOf('success') > -1;
-		}, (error) => {
-            return error;
+        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+        let cmd = 'idevice_ganymedeprepare -u ' + serial + ' -z ' + zone;
+        return exec(cmd).then((result) => {
+            return result.toLowerCase().indexOf('success') > -1;
+        }, (error) => {
+            reject(error);
         });
     }
 
@@ -263,7 +263,7 @@ class iDeviceClient extends EventEmitter {
     }
 
     getResolution(serial) {
-        return this.getProperties(serial, {domain: 'com.apple.mobile.iTunes'})
+        return this.getProperties(serial, { domain: 'com.apple.mobile.iTunes' })
             .then((result) => {
                 let resolution = {
                     width: parseInt(result['ScreenWidth'], 10),
@@ -288,14 +288,14 @@ class iDeviceClient extends EventEmitter {
     }
 
     getStorage(serial) {
-        return this.getProperties(serial, {domain: 'com.apple.disk_usage'})
+        return this.getProperties(serial, { domain: 'com.apple.disk_usage' })
             .then((result) => {
-				let disk = result['TotalDiskCapacity'];
+                let disk = result['TotalDiskCapacity'];
                 let size = result['TotalDataCapacity'];
                 let free = result['TotalDataAvailable'];
                 let used = size - free;
                 return {
-					disk: disk,
+                    disk: disk,
                     size: size,
                     used: used,
                     free: free,
@@ -305,7 +305,7 @@ class iDeviceClient extends EventEmitter {
     }
 
     getBattery(serial) {
-        return this.getProperties(serial, {domain: 'com.apple.mobile.battery'})
+        return this.getProperties(serial, { domain: 'com.apple.mobile.battery' })
             .then((result) => {
                 result['level'] = result['BatteryCurrentCapacity'];
                 return result;
@@ -313,7 +313,7 @@ class iDeviceClient extends EventEmitter {
     }
 
     getDeveloperStatus(serial) {
-        return this.getProperties(serial, {domain: 'com.apple.xcode.developerdomain'})
+        return this.getProperties(serial, { domain: 'com.apple.xcode.developerdomain' })
             .then((result) => {
                 return result['DeveloperStatus'];
             });
@@ -337,6 +337,20 @@ class iDeviceClient extends EventEmitter {
 
                 return result;
             });
+        });
+    }
+
+    getBatteryData(serial, ioregEntry) {
+        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+        let cmd = 'idevicediagnostics -u ' + serial + ' ioregentry ' + ioregEntry;
+
+        return exec(cmd).then((stdout) => {
+            try {
+                let result = plist.parse(stdout);
+                return result;
+            } catch (e) {
+                return {};
+            }
         });
     }
 }

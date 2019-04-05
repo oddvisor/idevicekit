@@ -31,16 +31,9 @@ class iDeviceClient extends EventEmitter {
     }
 
     // ## raw api ##
-    getEnclosureColorCode(serial) {
-        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = 'ideviceinfo -u ' + serial + ' -k DeviceEnclosureColor';
-        return exec(cmd).then((result) => {
-            return result.trim();
-        });
-    }
-
     getProperties(serial, option) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+        let result = '';
         let cmd = 'ideviceinfo -u ' + serial + ' -x';
         if (option) {
             if (('simple' in option) && (option['simple'])) {
@@ -48,17 +41,19 @@ class iDeviceClient extends EventEmitter {
             }
             if (('domain' in option) && (option['domain'])) {
                 cmd += ' -q ' + option['domain'];
-                if (('key' in option) && (option['key'])) {
-                    cmd += ' -k ' + option['key'];
-                }
+            }
+            if (('key' in option) && (option['key'])) {
+                cmd += ' -k ' + option['key'];
             }
         }
         return exec(cmd).then((stdout) => {
             try {
-                let result = plist.parse(stdout);
-                return result;
+                if (stdout) {
+                    result = plist.parse(stdout);
+                    return result;
+                }
             } catch (e) {
-                throw e;
+                return result;
             }
         });
     }

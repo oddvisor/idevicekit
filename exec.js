@@ -16,7 +16,7 @@ let exec = (cmd, option) => {
     return new Promise((resolve, reject) => {
         child_process.exec(cmd, defaultOption, (err, stdout, stderr) => {
             if (err) {
-                reject(stdout, stderr);
+                reject(stdout || stderr);
             } else {
                 resolve(stdout, stderr);
             }

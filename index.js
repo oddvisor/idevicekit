@@ -218,8 +218,8 @@ class iDeviceClient extends EventEmitter {
         let cmd = 'ideviceactivation -u ' + serial + ' activate';
         return exec(cmd).then((result) => {
             return result.toLowerCase().indexOf('success') > -1;
-        }, (error) => {
-            throw error;
+        }, (stdout, stderr) => {
+            throw stdout || stderr;
         });
     }
 

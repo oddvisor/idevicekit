@@ -253,7 +253,7 @@ class iDeviceClient extends EventEmitter {
         });
     }
 
-    getBatteryData(serial, ioregEntry) {
+    getIORegEntryData(serial, ioregEntry) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
         let cmd = 'idevicediagnostics -u ' + serial + ' ioregentry ' + ioregEntry;
 

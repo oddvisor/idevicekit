@@ -269,6 +269,22 @@ class iDeviceClient extends EventEmitter {
         });
     }
 
+    getMobileGestaltData(serial, gestaltKey) {
+        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+        let cmd = 'idevicediagnostics -u ' + serial + ' mobilegestalt ' + gestaltKey;
+
+        return exec(cmd).then((stdout) => {
+            try {
+                let result = plist.parse(stdout);
+                return result;
+            } catch (e) {
+                return {};
+            }
+        }, (error) => {
+            return {};
+        });
+    }
+
     // ## shortcut method ##
 
     getBasicInformation(serial) {

@@ -245,9 +245,9 @@ class iDeviceClient extends EventEmitter {
         });
     }
 
-    ganymedeReadFile(serial, filename, saveDirectory) {
+    ganymedeReadFile(serial, filename, saveDirectory, imei) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = 'idevice_ganymedeafc -u ' + serial + ' read ' + ' ' + filename + ' ' + saveDirectory;
+        let cmd = 'idevice_ganymedeafc -u ' + serial + ' read ' + ' ' + filename + ' ' + saveDirectory + ' ' + imei;
         return exec(cmd).then((result) => {
             return result.toLowerCase().indexOf('success') > -1;
         }, (error) => {

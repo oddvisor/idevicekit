@@ -7,11 +7,10 @@ const path = require('path');
 let exec = require('./exec');
 
 let _checkSerial = (serial) => {
-    //return /^[a-z0-9]{40,40}$/.test(serial);
     return serial.length > 0;
 };
 
-const absolutePath = 'C:\\Ganymede\\win-platform-tools\\libimobiledevice\\';
+const absolutePath = process.platform == "darwin" ? '' : 'C:\\Ganymede\\win-platform-tools\\libimobiledevice\\';
 
 class iDeviceClient extends EventEmitter {
     constructor() {

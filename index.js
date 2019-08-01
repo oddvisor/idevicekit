@@ -2,23 +2,25 @@ let EventEmitter = require('events');
 let plist = require('plist');
 let extend = require('extend');
 let fs = require('fs');
-const path = require('path');
-
 let exec = require('./exec');
 
 let _checkSerial = (serial) => {
     return serial.length > 0;
 };
 
-const absolutePath = process.platform == "darwin" ? '' : 'C:\\Ganymede\\win-platform-tools\\libimobiledevice\\';
+const path = require('path');
 
 class iDeviceClient extends EventEmitter {
     constructor() {
         super();
     }
 
+    setLibPath(libPath) {
+        this.absolutePath = process.platform == "darwin" ? '' : libPath;
+    }
+
     listDevices() {
-        return exec('idevice_id -l').then((stdout) => {
+        return exec(this.absolutePath + 'idevice_id -l').then((stdout) => {
             let devices = stdout.split('\n');
             let result = [];
             for (let device of devices) {
@@ -35,7 +37,7 @@ class iDeviceClient extends EventEmitter {
     getProperties(serial, option) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
         let result = '';
-        let cmd = absolutePath + 'ideviceinfo -u ' + serial + ' -x';
+        let cmd = this.absolutePath + 'ideviceinfo -u ' + serial + ' -x';
         if (option) {
             if (('simple' in option) && (option['simple'])) {
                 cmd += ' -s';
@@ -65,7 +67,7 @@ class iDeviceClient extends EventEmitter {
             'list': 'user'
         };
         defaultOption = extend(true, defaultOption, option);
-        let cmd = 'ideviceinstaller -u ' + serial + ' -l -o xml';
+        let cmd = this.absolutePath + 'ideviceinstaller -u ' + serial + ' -l -o xml';
         if (defaultOption['list'] === 'system') {
             cmd = cmd + ' -o list_system';
         }
@@ -85,26 +87,6 @@ class iDeviceClient extends EventEmitter {
             }
         });
     }
-
-    /*screencap(serial, option) {
-        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let defaultOption = {
-            format: 'png'
-        }
-        defaultOption = extend(true, defaultOption, option);
-        let sharp = require('sharp');
-        let tempfile = require('tempfile');
-        let tempTiffFile = tempfile('.tiff');
-        let cmd = 'idevicescreenshot -u ' + serial + ' ' + tempTiffFile;
-        return new Promise((resolve, reject) => {
-            exec(cmd).then((stdout) => {
-                let outputStream = sharp(tempTiffFile).toFormat(defaultOption.format).on('error', (err) => {
-                    reject(err);
-                });
-                resolve(outputStream);
-            }, reject);
-        });
-    }*/
 
     install(serial, ipa, option) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
@@ -126,7 +108,7 @@ class iDeviceClient extends EventEmitter {
         } else {
             resultPromise = Promise.resolve();
         }
-        let cmd = 'ideviceinstaller -u ' + serial + ' -i "' + ipa + '"';
+        let cmd = this.absolutePath + 'ideviceinstaller -u ' + serial + ' -i "' + ipa + '"';
         return resultPromise.then(() => {
             return new Promise((resolve, reject) => {
                 exec(cmd, { timeout: 300000 }).then((output) => {
@@ -161,7 +143,7 @@ class iDeviceClient extends EventEmitter {
         } else {
             resultPromise = Promise.resolve();
         }
-        let cmd = 'ideviceinstaller -u ' + serial + ' -U ' + packageid;
+        let cmd = this.absolutePath + 'ideviceinstaller -u ' + serial + ' -U ' + packageid;
         return resultPromise.then(() => {
             return new Promise((resolve, reject) => {
                 exec(cmd, { timeout: 300000 }).then((output) => {
@@ -179,7 +161,7 @@ class iDeviceClient extends EventEmitter {
 
     reboot(serial) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = 'idevicediagnostics restart -u ' + serial;
+        let cmd = this.absolutePath + 'idevicediagnostics restart -u ' + serial;
         return exec(cmd).then(() => {
             return true;
         });
@@ -187,7 +169,7 @@ class iDeviceClient extends EventEmitter {
 
     shutdown(serial) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = 'idevicediagnostics shutdown -u ' + serial;
+        let cmd = this.absolutePath + 'idevicediagnostics shutdown -u ' + serial;
         return exec(cmd).then(() => {
             return true;
         });
@@ -200,14 +182,14 @@ class iDeviceClient extends EventEmitter {
         } else {
             newName = '"' + newName.replace(/\"/g, '\\"') + '"';
         }
-        let cmd = 'idevicename -u ' + serial + ' ' + newName;
+        let cmd = this.absolutePath + 'idevicename -u ' + serial + ' ' + newName;
         return exec(cmd).then((result) => {
             return result.trim();
         });
     }
 
     runCommand(cmd) {
-        return exec(cmd).then((result) => {
+        return exec(this.absolutePath + cmd).then((result) => {
             return result;
         }, (error) => {
             throw error;
@@ -216,7 +198,7 @@ class iDeviceClient extends EventEmitter {
 
     activatePhone(serial) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = 'ideviceactivation -u ' + serial + ' activate';
+        let cmd = this.absolutePath + 'ideviceactivation -u ' + serial + ' activate';
         return exec(cmd).then((result) => {
             return result.toLowerCase().indexOf('success') > -1;
         }, (stdout, stderr) => {
@@ -226,7 +208,7 @@ class iDeviceClient extends EventEmitter {
 
     ganymedeUploadTestInfo(serial, sourcefile) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = 'idevice_ganymedeafc -u ' + serial + ' upload ' + sourcefile;
+        let cmd = this.absolutePath + 'idevice_ganymedeafc -u ' + serial + ' upload ' + sourcefile;
         return exec(cmd).then((result) => {
             return result.toLowerCase().indexOf('success') > -1;
         }, (error) => {
@@ -236,7 +218,7 @@ class iDeviceClient extends EventEmitter {
 
     ganymedeCheckFile(serial, filename) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = 'idevice_ganymedeafc -u ' + serial + ' list ' + filename;
+        let cmd = this.absolutePath + 'idevice_ganymedeafc -u ' + serial + ' list ' + filename;
         return exec(cmd).then((result) => {
             return result.toLowerCase().indexOf('success') > -1;
         }, (error) => {
@@ -246,7 +228,7 @@ class iDeviceClient extends EventEmitter {
 
     ganymedeReadFile(serial, filename, saveDirectory, imei, extension) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = 'idevice_ganymedeafc -u ' + serial + ' read ' + ' ' + filename + ' ' + saveDirectory + ' ' + imei + ' ' + extension;
+        let cmd = this.absolutePath + 'idevice_ganymedeafc -u ' + serial + ' read ' + ' ' + filename + ' ' + saveDirectory + ' ' + imei + ' ' + extension;
         return exec(cmd).then((result) => {
             return result.toLowerCase().indexOf('success') > -1;
         }, (error) => {
@@ -256,7 +238,7 @@ class iDeviceClient extends EventEmitter {
 
     ganymedePrepareIphone(serial, zone) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = 'idevice_ganymedeprepare -u ' + serial + ' -z ' + zone;
+        let cmd = this.absolutePath + 'idevice_ganymedeprepare -u ' + serial + ' -z ' + zone;
         return exec(cmd).then((result) => {
             return result.toLowerCase().indexOf('success') > -1;
         }, (error) => {
@@ -266,7 +248,7 @@ class iDeviceClient extends EventEmitter {
 
     getIORegEntryData(serial, ioregEntry) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = 'idevicediagnostics -u ' + serial + ' ioregentry ' + ioregEntry;
+        let cmd = this.absolutePath + 'idevicediagnostics -u ' + serial + ' ioregentry ' + ioregEntry;
 
         return exec(cmd).then((stdout) => {
             try {
@@ -282,7 +264,7 @@ class iDeviceClient extends EventEmitter {
 
     getMobileGestaltData(serial, gestaltKey) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = 'idevicediagnostics -u ' + serial + ' mobilegestalt ' + gestaltKey;
+        let cmd = this.absolutePath + 'idevicediagnostics -u ' + serial + ' mobilegestalt ' + gestaltKey;
 
         return exec(cmd).then((stdout) => {
             try {
@@ -368,11 +350,12 @@ class iDeviceClient extends EventEmitter {
     }
 
     crashreport(serial, appName) {
+        let self = this;
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let createTempCmd = `mktemp -d`;
+        let createTempCmd = 'mktemp -d';
         return exec(createTempCmd).then((tmpDir) => {
             tmpDir = tmpDir.trim();
-            let cmd = `idevicecrashreport -u "${serial}" -e "${tmpDir}"`;
+            let cmd = self.absolutePath + 'idevicecrashreport -u "${serial}" -e "${tmpDir}"';
             return exec(cmd).then(() => {
                 let crashLogRegex = new RegExp(`^${appName}.*\.ips$`);
                 let result = {};

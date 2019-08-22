@@ -115,10 +115,10 @@ class iDeviceClient extends EventEmitter {
                     if (/\sComplete\s/.test(output)) {
                         resolve(output);
                     } else {
-                        reject(output);
+                        reject({"message": output});
                     }
-                }, (code, stdout, stderr) => {
-                    reject(code);
+                }, (error) => {
+                    reject({"message": error});
                 });
             })
         });
@@ -150,10 +150,10 @@ class iDeviceClient extends EventEmitter {
                     if (/\sComplete\s/.test(output)) {
                         resolve(output);
                     } else {
-                        reject(output);
+                        reject({"message": output});
                     }
-                }, (code, stdout, stderr) => {
-                    reject(code);
+                }, (error) => {
+                    reject({"message": error});
                 });
             })
         });

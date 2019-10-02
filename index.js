@@ -236,9 +236,9 @@ class iDeviceClient extends EventEmitter {
         });
     }
 
-    ganymedePrepareIphone(serial, zone) {
+    ganymedePrepareIphone(serial, keys, zone) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = this.absolutePath + 'idevice_ganymedeprepare -u ' + serial + ' -z ' + zone;
+        let cmd = this.absolutePath + 'idevice_ganymedeprepare -u ' + serial + ' -k ' + keys + ' -z ' + zone;
         return exec(cmd).then((result) => {
             return result.toLowerCase().indexOf('success') > -1;
         }, (error) => {

@@ -215,6 +215,16 @@ class iDeviceClient extends EventEmitter {
             throw error;
         });
     }
+    
+    ganymedeUploadFileAs(serial, sourcefile, targetFileName) {
+        if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
+        let cmd = this.absolutePath + 'idevice_ganymedeafc -u ' + serial + ' upload ' + sourcefile + ' saveas ' + targetFileName;
+        return exec(cmd).then((result) => {
+            return result.toLowerCase().indexOf('success') > -1;
+        }, (error) => {
+            throw error;
+        });
+    }
 
     ganymedeCheckFile(serial, filename) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
@@ -236,9 +246,9 @@ class iDeviceClient extends EventEmitter {
         });
     }
 
-    ganymedePrepareIphone(serial, keys, zone) {
+    ganymedePrepareIphone(serial, keys, zone, assistiveFlag) {
         if (!_checkSerial(serial)) return Promise.reject('invalid serial number');
-        let cmd = this.absolutePath + 'idevice_ganymedeprepare -u ' + serial + ' -k ' + keys + ' -z ' + zone;
+        let cmd = this.absolutePath + 'idevice_ganymedeprepare -u ' + serial + ' -k ' + keys + ' -z ' + zone + ' ' + assistiveFlag;
         return exec(cmd).then((result) => {
             return result.toLowerCase().indexOf('success') > -1;
         }, (error) => {
